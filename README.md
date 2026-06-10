@@ -1,2 +1,1 @@
-# jISS
-java Immune System Simulator
+java Pulmonary Agent-based Infection simulator for COVID19 with Sirolimus treatment.
