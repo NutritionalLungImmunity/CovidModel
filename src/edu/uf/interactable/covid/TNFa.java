@@ -1,37 +1,43 @@
 package edu.uf.interactable.covid;
 
+
+
 import edu.uf.Diffusion.Diffuse;
 import edu.uf.interactable.Interactable;
+import edu.uf.interactable.covid.Macrophage;
 import edu.uf.interactable.Molecule;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.utils.Constants;
 import edu.uf.utils.Util;
+import edu.uf.intracellularState.EukaryoteSignalingNetwork;
+import edu.uf.utils.Constants;
+import edu.uf.utils.Util;
 
-public class VEGF extends Molecule{
-   
-	public static final String NAME = "VEGF";
+public class TNFa extends Molecule{
+
+	public static final String NAME = "TNFa";
 	public static final int NUM_STATES = 1;
 	public static final int MOL_IDX = getReceptors();
 	
-	private static VEGF molecule = null;
+	private static TNFa molecule = null;
     
-    protected VEGF(double[][][][] qttys, Diffuse diffuse) {
+    private TNFa(double[][][][] qttys, Diffuse diffuse) {
 		super(qttys, diffuse);
 	}
     
-    public static VEGF getMolecule(double[][][][] values, Diffuse diffuse) {
+    public static TNFa getMolecule(double[][][][] values, Diffuse diffuse) {
     	if(molecule == null) {
-    		molecule = new VEGF(values, diffuse);
+    		molecule = new TNFa(values, diffuse);
     	}
     	return molecule;
     }
     
-    public static Molecule getMolecule() {
+    public static TNFa getMolecule() {
     	return molecule;
     }
     
     public void degrade() {
-    	degrade(Constants.VEGF_HALF_LIFE, 0);
+    	degrade(Constants.TNF_HALF_LIFE, 0);
     }
 
     public int getIndex(String str) {
@@ -43,15 +49,7 @@ public class VEGF extends Molecule{
     }
 
     protected boolean templateInteract(Interactable interactable, int x, int y, int z) {
-        if(interactable instanceof EndothelialCells) {
-        	EndothelialCells cell = (EndothelialCells) interactable;
-			EukaryoteSignalingNetwork.VEGF_e = VEGF.MOL_IDX;
-	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_VEGF, cell.getClock()))
-	        	cell.bind(VEGF.MOL_IDX);
-	        if (cell.inPhenotype(this.getSecretionPhenotype()))//# and interactable.state == Neutrophil.INTERACTING:
-        		this.inc(Constants.VEGF_QTTY, 0, x, y, z);
-	        return true;
-        }
+
         return interactable.interact(this, x, y, z);
     }
 
@@ -62,7 +60,7 @@ public class VEGF extends Molecule{
 
 	@Override
 	public double getThreshold() {
-		return -1;
+		return 0;
 	}
 
 	@Override

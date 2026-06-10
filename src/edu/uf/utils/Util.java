@@ -10,12 +10,27 @@ import edu.uf.time.Clock;
 
 public class Util {
 	
+	public static double toCovidConcentration(int particles) {
+		return ((particles/Constants.ACTV_PER_PARTICLES)/Constants.AVOGRADO);
+	}
+	
 	public static double michaelianKinetics(
 			double substrate1, 
 			double substrate2, 
 			double km, 
 			double h) {
 		return michaelianKinetics(substrate1, substrate2, km, h, 1, Constants.VOXEL_VOL);
+	}
+	
+	public static int createVirus(double avg, double eps, int qtty) {
+		if(avg > 0) return Rand.getRand().randpois(avg, Constants.RPOIS_THRESHOLD);
+		else if(avg < 0) {
+			
+			int k = -Rand.getRand().randpois(-avg, Constants.RPOIS_THRESHOLD);
+//			System.out.println(avg + " " + k + " " + qtty + " " + (-k > (qtty - 1) ? k : -(qtty - 1)));
+			return -k <= (qtty - 1) ? k : -(qtty - 1);
+		}
+		return Rand.getRand().randpois(eps);
 	}
 	
 	public static double michaelianKinetics(
@@ -124,7 +139,7 @@ public class Util {
     	if(agent.attractedBy() == null)
     		return Constants.DRIFT_BIAS;
     	
-    	Chemokine chemokine = (Chemokine) voxel.getMolecules().get(agent.attractedBy());
+    	Chemokine chemokine = (Chemokine) Voxel.getMolecules().get(agent.attractedBy());
     	return chemokine.chemoatract(voxel.getX(), voxel.getY(), voxel.getZ());
     }
     

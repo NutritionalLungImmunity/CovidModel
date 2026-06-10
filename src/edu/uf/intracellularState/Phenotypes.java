@@ -13,7 +13,7 @@ public interface Phenotypes {
 	public static final int ANG_ACTIVE = 7;
 	public static final int IRF3 = 8;
 	public static final int APOPTOTIC = 9;
-	public static final int NECROTIC = 10;
+	//public static final int NECROTIC = 10;
 	
 	public static final int STAT3 = 11;
 	public static final int OPEN = 12;
@@ -23,6 +23,10 @@ public interface Phenotypes {
 	
 	public static final int IRF9 = 14;
 	public static final int AKT = 15;
+	
+	public static final int VIRAL_INC = 16; //added for viral load increase function
+	public static final int IFN = 17;
+	public static final int ANG_2 = 18;
 	
 	
 	

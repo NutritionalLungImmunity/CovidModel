@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.Set;
 
 import edu.uf.compartments.Voxel;
+import edu.uf.interactable.covid.Pneumocyte;
 import edu.uf.intracellularState.BooleanNetwork;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.intracellularState.Phenotypes;
@@ -35,13 +36,26 @@ public abstract class Cell extends Interactable{
     private boolean engulfed;
     protected BooleanNetwork booleanNetwork;
     protected Clock clock;
-    
-    public final BooleanNetwork createBooleanNetwork() {
+	protected Set<Cell> neighbours = new HashSet<>();
+	private boolean nkKillable = true;
+ 
+	
+
+
+	public final BooleanNetwork createBooleanNetwork() {
     	if(booleanNetwork == null) {
     		booleanNetwork = createNewBooleanNetwork();
     	}
     	return booleanNetwork;
     }
+	
+	public void setNkKillable(boolean nkKillable) {
+		this.nkKillable = nkKillable;
+	}
+	
+	public boolean isNkKillable() {
+		return nkKillable;
+	}
     
     protected abstract BooleanNetwork createNewBooleanNetwork();
 
@@ -49,7 +63,20 @@ public abstract class Cell extends Interactable{
 	public double getIronPool() {
 		return ironPool;
 	}
+	
+	public boolean addNeighbour(Cell neighbour) {
+		if(neighbour.equals(this)) return false;
+		if(neighbours.contains(neighbour)) return false;
+		neighbours.add(neighbour);
+		neighbour.addNeighbour(this);
+		return true;
+	}
+	
 
+
+	public Set<Cell> getNeighbours() {
+		return neighbours;
+	}
 
 	public void setIronPool(double ironPool) {
 		this.ironPool = ironPool;

@@ -106,6 +106,7 @@ public class Neutrophil extends Phagocyte{
             	EukaryoteSignalingNetwork.B_GLUC_e = Afumigatus.RECEPTOR_IDX;
                 if(interac.getStatus() == Afumigatus.HYPHAE || interac.getStatus() == Afumigatus.GERM_TUBE) {
                     double pr = Constants.PR_N_HYPHAE;
+                    //System.out.println(Rand.getRand().randunif());
                     if (Rand.getRand().randunif() < pr) {
                         Phagocyte.intAspergillus(this, interac);
                         interac.setStatus(Afumigatus.DYING);

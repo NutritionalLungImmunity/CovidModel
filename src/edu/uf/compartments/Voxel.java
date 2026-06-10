@@ -9,7 +9,7 @@ import edu.uf.interactable.Interactable;
 import edu.uf.interactable.Molecule;
 import edu.uf.interactable.Phagocyte;
 import edu.uf.interactable.covid.NK;
-import edu.uf.interactable.covid.Neutrophil;
+import edu.uf.utils.Rand;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,13 +37,18 @@ public class Voxel {
     private static Map<String, Molecule> infectiousAgentMolecules;
     private List<Voxel> neighbors;
     private Quadrant quadrant;
+    private int numSamples;
+    private static boolean noInteraction;
     
-    static {
+
+
+
+	static {
     	molecules = new HashMap<>();
     	infectiousAgentMolecules = new HashMap<>();
     }
 
-    public Voxel(int x, int y, int z) { 
+    public Voxel(int x, int y, int z, int numSamples) { 
         this.x = x;
         this.y = y;
         this.z = z;
@@ -56,7 +61,12 @@ public class Voxel {
         //this.infectiousAgentMolecules = new HashMap<>();
         this.neighbors = new ArrayList<>();
         this.quadrant = null;
+        this.numSamples = numSamples;
     }
+    
+    public static void setNoInteraction(boolean noInteraction) {
+		Voxel.noInteraction = noInteraction;
+	}
     
     public int getX() {
 		return x;
@@ -241,18 +251,24 @@ public class Voxel {
     }
     
     public void interact() {
-    	
+    	if(noInteraction) return;
         List<Cell> cells = (List<Cell>) this.toList(this.cells);
         List<Molecule> mols = (List<Molecule>) this.toList(molecules);
         List<InfectiousAgent> infectiousAgents = (List<InfectiousAgent>) this.toList(this.infectiousAgents);
         List<Molecule> infectiousMolecules = (List<Molecule>) this.toList(this.infectiousAgentMolecules);
         
         int size = cells.size();
-        if(size > 2) {
-        	Collections.shuffle(cells, new Random());
+        int[] cellsIndices = null;
+        int[] infIndices = new int[infectiousAgents.size()];
+        for(int i = 0; i < infectiousAgents.size(); i++)
+        	infIndices[i] = i;
+        //if(size > 2) {
+        	cellsIndices = Rand.getRand().sample(cells.size(), numSamples == -1 ? cells.size() : numSamples);
+        	if(numSamples != -1 ) infIndices = Rand.getRand().sample(infectiousMolecules.size(), numSamples);
+        	//Collections.shuffle(cells, new Random());
         	Collections.shuffle(mols, new Random());
         	Collections.shuffle(infectiousMolecules, new Random());
-        }	
+       // }	
             
         int molSize = mols.size();
         int cellSize = cells.size();
@@ -277,23 +293,23 @@ public class Voxel {
                 		}
                 break;
             case 1:
-            	for(int i = 0; i < cellSize; i++) 
-            		for(int j = i; j < cellSize; j++) 
+            	for(int i : cellsIndices) 
+            		for(int j : cellsIndices) 
                         cells.get(i).interact(cells.get(j), this.x, this.y, this.z);
             	break;
             case 2:
-            	for(int i = 0; i < cellSize; i++) 
+            	for(int i : cellsIndices) 
             		for(int j = 0; j < molSize; j++) 
                         cells.get(i).interact(mols.get(j), this.x, this.y, this.z);
             	break;
             case 3:
-            	for(int i = 0; i < cellSize; i++) 
-            		for(int j = 0; j < infAgSize; j++)
+            	for(int i : cellsIndices) 
+            		for(int j : infIndices)
             			cells.get(i).interact(infectiousAgents.get(j), this.x, this.y, this.z);
             	break;
             case 4:
             	for(int i = 0; i < infMolSize; i++) 
-            		for(int j = 0; j < infAgSize; j++)
+            		for(int j : infIndices)
             			infectiousMolecules.get(i).interact(infectiousAgents.get(j), this.x, this.y, this.z);
             	break;
             default:

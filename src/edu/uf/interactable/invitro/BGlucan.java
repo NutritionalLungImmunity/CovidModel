@@ -5,8 +5,6 @@ import edu.uf.interactable.Afumigatus;
 import edu.uf.interactable.Interactable;
 import edu.uf.interactable.Macrophage;
 import edu.uf.interactable.Molecule;
-import edu.uf.interactable.covid.DAMP;
-import edu.uf.interactable.covid.Neutrophil;
 import edu.uf.interactable.covid.Pneumocyte;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.utils.Constants;
@@ -50,24 +48,26 @@ public class BGlucan extends Molecule{
     }
 
     protected boolean templateInteract(Interactable interactable, int x, int y, int z) {
-    	EukaryoteSignalingNetwork.B_GLUC_e = Afumigatus.RECEPTOR_IDX;
+    	EukaryoteSignalingNetwork.B_GLUC_e = MOL_IDX;//Afumigatus.RECEPTOR_IDX;
         if(interactable instanceof Pneumocyte) {
         	Pneumocyte cell = (Pneumocyte) interactable;
-        	if (Util.activationFunction(this.get(0, x, y, z), 1, cell.getClock())) 
+        	if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_BGLUCAN, cell.getClock())) 
 	        	cell.bind(BGlucan.MOL_IDX);
 	        return true;
         }
-        if(interactable instanceof Neutrophil) {
-        	Neutrophil cell = (Neutrophil) interactable;
-	        if (Util.activationFunction(this.get(0, x, y, z), 1, cell.getClock())) 
-	        	cell.bind(BGlucan.MOL_IDX);
-	        return true;
-        }
+//        if(interactable instanceof Neutrophil) {
+//        	Neutrophil cell = (Neutrophil) interactable;
+//	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_BGLUCAN, cell.getClock())) 
+//	        	cell.bind(BGlucan.MOL_IDX);
+//	        return true;
+//        }
         
         if(interactable instanceof Macrophage) {
         	Macrophage cell = (Macrophage) interactable;
-	        if (Util.activationFunction(this.get(0, x, y, z), 1, cell.getClock())) 
+        	//System.out.println(Util.activationFunction(this.get(0, x, y, z), Constants.Kd_BGLUCAN, cell.getClock()));
+	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_BGLUCAN, cell.getClock())) {
 	        	cell.bind(BGlucan.MOL_IDX);
+	        }
 	        return true;
         }
         return interactable.interact(this, x, y, z);

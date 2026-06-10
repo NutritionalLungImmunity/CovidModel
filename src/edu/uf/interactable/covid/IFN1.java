@@ -1,8 +1,10 @@
 package edu.uf.interactable.covid;
 
+
+
 import edu.uf.Diffusion.Diffuse;
 import edu.uf.interactable.Interactable;
-import edu.uf.interactable.Macrophage;
+import edu.uf.interactable.covid.Macrophage;
 import edu.uf.interactable.Molecule;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.utils.Constants;
@@ -11,7 +13,8 @@ import edu.uf.utils.Util;
 public class IFN1 extends Molecule{
 	public static final String NAME = "IFN_I";
 	public static final int NUM_STATES = 1;
-	public static final int MOL_IDX = getReceptors();
+	public static final int MOL_IDX = getReceptors(); 
+//	Indexes.IFN_e;
 	
 	private static IFN1 molecule = null;
     
@@ -43,23 +46,29 @@ public class IFN1 extends Molecule{
     }
 
     protected boolean templateInteract(Interactable interactable, int x, int y, int z) {
-    	EukaryoteSignalingNetwork.IFNG_e = IFN1.MOL_IDX;
-        if(interactable instanceof Pneumocyte) {
-        	Pneumocyte cell = (Pneumocyte) interactable;
-	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_IFNG, cell.getClock()))
-	        	cell.bind(IFN1.MOL_IDX);
-	        if (cell.inPhenotype(this.getSecretionPhenotype()))//# and interactable.state == Neutrophil.INTERACTING:
-        		this.inc(Constants.MA_IFN_QTTY, 0, x, y, z);
-	        return true;
-        }
+    	
         if(interactable instanceof Macrophage) {
+//        	System.out.println(Constants.MA_IFN_QTTY);
         	Macrophage cell = (Macrophage) interactable;
-	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_IFNG, cell.getClock()))
-	        	cell.bind(IFN1.MOL_IDX);
-	        if (cell.inPhenotype(this.getSecretionPhenotype()))//# and interactable.state == Neutrophil.INTERACTING:
-        		this.inc(Constants.MA_IFN_QTTY, 0, x, y, z);
+	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_IFNG, cell.getClock())) {
+	        	if (cell.getPhenotype() == Macrophage.M2) cell.setPhenotype(Macrophage.M1);
+	        	cell.setIfn(true);
+	        }
+//	        	cell.setPhenotype(Macrophage.M1);
+//	        	
+//	        System.out.println(Constants.MA_IFN_QTTY*cell.getMul());
+	        
+//	        System.out.println(((cell.getPhenotype() == Macrophage.M1 && cell.getViralLoad() > 0) || (cell.getPhenotype() == Macrophage.AM && cell.getViralLoad() > 0)));
+	        if ((cell.getPhenotype() == Macrophage.M1 && cell.getViralLoad() > 0) || (cell.getPhenotype() == Macrophage.AM && cell.getViralLoad() > 0)){//# and interactable.state == Neutrophil.INTERACTING:
+        		this.inc(Constants.MA_IFN_QTTY*cell.getMul(), 0, x, y, z);
+//        		System.out.println(Constants.MA_IFN_QTTY + " " + cell.getMul());
+	        }
+	        
+//	        System.out.println(this.getTotalMolecule(0));
+
 	        return true;
         }
+       
         return interactable.interact(this, x, y, z);
     }
 

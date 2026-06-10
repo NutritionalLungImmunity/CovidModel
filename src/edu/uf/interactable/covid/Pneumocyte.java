@@ -2,15 +2,18 @@ package edu.uf.interactable.covid;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Random;
+import java.util.Set;
 
 import edu.uf.interactable.Afumigatus;
-import edu.uf.interactable.IL6;
+import edu.uf.interactable.Cell;
+import edu.uf.interactable.covid.IL6;
 import edu.uf.interactable.Interactable;
 import edu.uf.interactable.Molecule;
 import edu.uf.interactable.TGFb;
-import edu.uf.interactable.TNFa;
+import edu.uf.interactable.covid.TNFa;
 import edu.uf.intracellularState.BooleanNetwork;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.intracellularState.Phenotypes;
@@ -18,21 +21,60 @@ import edu.uf.utils.Constants;
 import edu.uf.utils.Rand;
 import edu.uf.utils.Util;
 
+
 public class Pneumocyte extends edu.uf.interactable.Pneumocyte{
 	
-	private double viralLoad;
+	public static final int RESISTANT = 1;
+	public static final int SUSCEPTIBLE = 2;
 	
+	private double il10Mult = 1;
+	
+	private int viralLoad;
+	private int phenotype;
+	private double mul = 1;
+	
+	private boolean sirolimus;
+
 	public Pneumocyte() {
 		super();
-		this.createBooleanNetwork();
+		phenotype = SUSCEPTIBLE;
 	}
 	
-	public void incViralLoad(double virus) {
+	
+	public boolean isSirolimus() {
+		return sirolimus;
+	}
+
+
+
+	public void setSirolimus(boolean sirolimus) {
+		this.sirolimus = sirolimus;
+	}
+
+
+
+	public int getPhenotype() {
+		return phenotype;
+	}
+
+	public double getMul() {
+		return mul;
+	}
+
+	public void setMul(double mul) {
+		this.mul = mul;
+	}
+
+	public void setPhenotype(int phenotype) {
+		this.phenotype = phenotype;
+	}
+
+	public void incViralLoad(int virus)  {
 		this.viralLoad += virus;
 		((SarsCoV2) SarsCoV2.getMolecule()).incInternalLoad(virus);
 	}
 	
-	public double getViralLoad() {
+	public int getViralLoad() {
 		return this.viralLoad;
 	}
 	
@@ -41,124 +83,84 @@ public class Pneumocyte extends edu.uf.interactable.Pneumocyte{
 		this.viralLoad = 0;
 	}
 	
-	@Override
-	protected BooleanNetwork createNewBooleanNetwork() {
-		return new EukaryoteSignalingNetwork() {
 
-			static final int size = 9;
-			static final int NUM_PHENOTYPES = 3;
-			
-			static final int VIRUS = 0;
-			static final int VIRAL_REP = 1;
-			static final int IRF3 = 2;
-			static final int STAT1 = 3;
-			static final int IRF9 = 4;
-			static final int TLR4 = 5;
-			static final int RIG1 = 6;
-			static final int IFNR = 7;
-			static final int IFN = 8;
-			
-			{
-				this.inputs = new int[NUM_RECEPTORS];
-				this.booleanNetwork = new int[] {0, 0, 0, 0, 0, 0, 0, 0, 0, 0};
-			}
-			
-			@Override
-			public void processBooleanNetwork() {
-				if(Pneumocyte.this.getClock().toc(BN_CLOCK, Constants.HALF_HOUR/Constants.TIME_STEP_SIZE)) { //convet minutes in iterations
-					int k = 0;
-					List<Integer> array = new ArrayList<>(size);
-					for(int i = 0; i < size; i++)
-						array.add(i);
-					//System.out.println();
-					//Pneumocyte.count = 0;
-					while(true) {
-						if(k++ > Constants.MAX_BN_ITERATIONS)break;
-						Collections.shuffle(array, new Random());
-						//if(this.booleanNetwork[VIRUS] == 1)Util.printIntArray(booleanNetwork);
-						//int virus_in = Util.activationFunction(Pneumocyte.this.viralLoad, Constants.Kd_SarsCoV2, Constants.MA_VOL, 1.0) > 
-						//	Rand.getRand().randunif() ? 1 : 0;
-						for(int i : array) {
-							switch (i) {
-							case 0:
-								this.booleanNetwork[VIRUS] = or(e(this.inputs, VIRUS_e), this.booleanNetwork[VIRUS]);
-								break;
-							case 1:
-								this.booleanNetwork[VIRAL_REP] = and(this.booleanNetwork[VIRUS], not(this.booleanNetwork[IRF9], 1));
-								break;
-							case 2:
-								this.booleanNetwork[IRF3] = this.booleanNetwork[TLR4];//or(this.booleanNetwork[RIG1], this.booleanNetwork[TLR4]);
-								break;
-							case 3:
-								this.booleanNetwork[STAT1] = this.booleanNetwork[IFNR];
-								break;
-							case 4:
-								this.booleanNetwork[IRF9] = this.booleanNetwork[STAT1];
-								break;
-							case 5:
-								this.booleanNetwork[TLR4] = o(this.inputs, TLR4_o);
-								break;
-							case 6:
-								this.booleanNetwork[RIG1] = this.booleanNetwork[VIRAL_REP];
-								break;
-							case 7:
-								this.booleanNetwork[IFNR] = this.booleanNetwork[IFN];
-								break;	
-							case 8:
-								this.booleanNetwork[IFN] = or(this.booleanNetwork[IRF3], e(this.inputs, IFNG_e));
-								//r(this.inputs, IFNG_e);
-								break;
-							default:
-								System.err.println("No such rule " + i);
-							}
-						}
-					}
-					array = new ArrayList<>();
-					
-					for(int i = 0; i < NUM_RECEPTORS; i++) 
-						this.inputs[i] = 0;
-					
-					for(int i = 0; i < NUM_PHENOTYPES; i++)
-						array.add(i);
-					
-					Pneumocyte.this.clearPhenotype();
-					
-					if(this.booleanNetwork[IRF9] == 1)
-						Pneumocyte.this.addPhenotype(Phenotypes.IRF9);
-					if(this.booleanNetwork[IRF3] == 1)
-						Pneumocyte.this.addPhenotype(Phenotypes.IRF3);
-				}
-			}
-		};
+	
+
+	public BooleanNetwork networkFactory() {
+		return null;
 	}
+
+	
+//	//for multiple types of Boolean network
+	public BooleanNetwork createNewBooleanNetwork() {
+		return  null; 
+	}
+
 	
 	protected boolean templateInteract(Interactable interactable, int x, int y, int z) {
-        if (interactable instanceof TGFb) {
-            Molecule interact = (Molecule) interactable;
-        	if(this.inPhenotype(interact.getSecretionPhenotype())) 
-            	interact.inc(Constants.MA_TGF_QTTY, 0, x, y, z);
-            return true;
+//    	EukaryoteSignalingNetwork.IFN_e = IFN1.MOL_IDX;
+        if(interactable instanceof IFN1) {
+        	IFN1 mol = (IFN1) interactable;
+	        if (Util.activationFunction(mol.get(0, x, y, z), Constants.Kd_IFNG, this.getClock()))
+	        	this.setPhenotype(RESISTANT);
+	        return true;
         }
-		
+        
+        if(interactable instanceof IL10) {
+        	IL10 mol = (IL10) interactable;
+	        if (Util.activationFunction(mol.get(0, x, y, z), Constants.Kd_IL10, this.getClock()))
+	        	this.il10Mult = 1; 
+	        return true;
+        }
+        
+        if(interactable instanceof TNFa) {
+        	TNFa mol = (TNFa) interactable;
+	        if (Util.activationFunction(mol.get(0, x, y, z), Constants.Kd_TNF, this.getClock()))
+	        	this.il10Mult = Constants.MTORC_SarsCoV2_REP_RATE_MUL; 
+	        return true;
+        }
+        
         return super.templateInteract(interactable, x, y, z);
     }
 	
+	
+//	public double getIl10Mult() {
+//		return il10Mult;
+//	}
+
+
+
+//	public void setIl10Mult(double il10Mult) {
+//		this.il10Mult = il10Mult;
+//	}
+
+
+
 	public void updateStatus() {
 		if(this.getStatus() == DEAD)return;
-		this.processBooleanNetwork();
-		if(!this.inPhenotype(Phenotypes.IRF9) && this.viralLoad > 0) {
-			double qtty = this.viralLoad*Constants.SarsCoV2_REP_RATE;
+//		this.processBooleanNetwork();
+		this.interactNeighbours();
+		double repRate = 0;
+		if(phenotype == SUSCEPTIBLE) repRate = Constants.SarsCoV2_REP_RATE*this.il10Mult*mul;
+		else repRate = Constants.SarsCoV2_IFN_REP_RATE*this.il10Mult*mul;
+		if(this.viralLoad > 0) {
+			double avg = this.viralLoad*repRate*(1-this.viralLoad/Constants.MAX_VIRAL_LOAD);
+			int qtty = Util.createVirus(avg, Constants.SarsCoV2_EPS, this.viralLoad);
 			this.viralLoad += qtty;
 			((SarsCoV2) SarsCoV2.getMolecule()).incInternalLoad(qtty);
+			if(Rand.getRand().randunif() < Constants.PR_PNEUMOCYTE_CHANGE) {
+				if(phenotype == SUSCEPTIBLE) this.setPhenotype(RESISTANT);
+				else this.setPhenotype(SUSCEPTIBLE);
+			}
 		}
 		
-		//if(this.viralLoad > Constants.MAX_VIRAL_LOAD)
-		if(viralLoad > Constants.MAX_VIRAL_LOAD)
-			Pneumocyte.this.addPhenotype(Phenotypes.NECROTIC);
-		
-		//if(this.getPhenotype() != 0)System.out.println(this.getPhenotype());
-		if(this.inPhenotype(new int[] {Phenotypes.APOPTOTIC, Phenotypes.NECROTIC})) 
+    	if(this.inPhenotype(new int[] {Phenotypes.APOPTOTIC})) 
 			this.die();
+    	
+    	this.setSirolimus(false);
+	}
+	
+	private void interactNeighbours() {
+		NetworkingCell.interactNeighbours(this);
 	}
 }
-

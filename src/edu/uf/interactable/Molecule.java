@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import edu.uf.Diffusion.Diffuse;
-import edu.uf.interactable.covid.IL6Complex;
 import edu.uf.utils.Constants;
 
 public abstract class Molecule extends Interactable{
@@ -13,7 +12,7 @@ public abstract class Molecule extends Interactable{
 	
 	public static final int NUM_COMPARTMENTS = 2;
 	
-	private double[][][][] values;
+	public double[][][][] values;
 	private double[][] compartimentValues;
 	private double[] totalMolecules;
 	protected double[] totalMoleculesAux;
@@ -56,7 +55,11 @@ public abstract class Molecule extends Interactable{
 	}
 	
 	private void incTotalMolecule(int index, double inc) {
-    	this.totalMolecules[index] = this.totalMolecules[index] + inc;
+		this.totalMolecules[index] = this.totalMolecules[index] + inc;
+    }
+	
+	public void resetTotalMolecule(int index) {
+		this.totalMolecules[index] = 0;
     }
 	
 	public double inc(double qtty, String index, int x, int y, int z) {
@@ -146,9 +149,13 @@ public abstract class Molecule extends Interactable{
     		set(qtty, index, x);
     		return;
     	}
+		//System.out.println(this.totalMolecules[index]);
+		//System.out.println(this.values[index][x][y][z]);
         this.incTotalMolecule(index, - this.values[index][x][y][z]);
         this.incTotalMolecule(index, qtty);
         this.values[index][x][y][z] = qtty;
+        //System.out.println(this.totalMolecules[index]);
+        //System.out.println(this.values[index][x][y][z]);
     }
 	
 	public double get(String index, int x, int y, int z) {

@@ -465,8 +465,8 @@ public class Afumigatus extends PositionalInfectiousAgent{
             this.setState(Afumigatus.FREE); 
 
         this.diffuseIron();
-        //if(this.nextBranch == null)
-            //this.growable = true;
+        if(this.nextBranch == null)
+            this.growable = true;
     }
 
     public boolean isDead() {

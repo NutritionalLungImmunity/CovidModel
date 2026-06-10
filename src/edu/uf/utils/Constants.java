@@ -12,6 +12,7 @@ public class Constants {
 	public static double UNIT_T = TIME_STEP_SIZE/((double) HALF_HOUR);
 	public static double STD_UNIT_T = TIME_STEP_SIZE/((double) HOUR);
 	public static double REL_CYT_BIND_UNIT_T = TIME_STEP_SIZE/((double) CYT_BIND_T);
+	public static double INV_UNIT_T = HALF_HOUR/((double)TIME_STEP_SIZE);
 	
 	public static int ITER_TO_SWELLING = 118;
 	public static double PR_ASPERGILLUS_CHANGE = 0.003850817669777474;
@@ -27,7 +28,7 @@ public class Constants {
 	public static double CONIDIA_VOL = 4.844e-14; // L
 	public static double MA_VOL = 4.849048e-12; // L
 	public static double SPACE_VOL = 6.4e-8; // L
-	public static double SERUM_VOL = 3e-3; // L (KIND OF DUMMY)
+	public static double SERUM_VOL = 3e-3; // L (KIND OF DUMMY) 
 	
 	public static double PR_BRANCH = 0.25; // 25%
 	
@@ -38,13 +39,16 @@ public class Constants {
 	
 	public static double TAFC_QTTY = 1.0000e-15 * STD_UNIT_T;
 	public static double HEMOLYSIN_QTTY = 1.386667e-10 * STD_UNIT_T;
-	public static double MA_IL6_QTTY = 1.4615e-20 * STD_UNIT_T;
+//	public static double MA_IL6_QTTY = 1.4615e-20 * STD_UNIT_T;
+	public static double MA_IL6_QTTY = 5e-20 * 1.75 * STD_UNIT_T; //*1.75 new fitting to Dinnon and Mauter paper
 	public static double MA_IL8_QTTY = 5.072776e-19 * STD_UNIT_T;
 	public static double MA_MCP1_QTTY = 1.757245e-20 * STD_UNIT_T;
 	public static double MA_MIP1B_QTTY = 1.7896e-20 * STD_UNIT_T;
 	public static double MA_MIP2_QTTY = 1.1061e-19 * STD_UNIT_T;
-	public static double MA_IL10_QTTY = 6.9735e-22 * STD_UNIT_T;
-	public static double MA_TNF_QTTY = 3.2179e-20 * STD_UNIT_T;
+	//public static double MA_IL10_QTTY = 6.9735e-22 * STD_UNIT_T;
+	public static double MA_IL10_QTTY = 1.1e-20 * 1.75 * STD_UNIT_T; //*1.75 new fitting to Dinnon and Mauter paper //https://doi.org/10.1038/s41586-020-2708-8
+	//public static double MA_TNF_QTTY = 3.2179e-20 * STD_UNIT_T;
+	public static double MA_TNF_QTTY = 5e-21 * 1.75 * STD_UNIT_T; //*1.75 new fitting to Dinnon and Mauter paper
 	public static double MA_TGF_QTTY = 1.0119e-21 * STD_UNIT_T;
 	public static double MA_IL1_QTTY = 5.645925e-21 * STD_UNIT_T;
 	public static double GRANULE_QTTY = 1; //AU
@@ -101,6 +105,7 @@ public class Constants {
     public static double Kd_TfR2 = 2.7e-8;
     public static double Kd_LPS = 3e-9; //~3nM
     public static double Kd_GM_CSF = 6e-11; //20-100pM
+    public static double Kd_BGLUCAN = 1.0;
 	
 	
 	public static double MA_IRON_IMPORT_RATE = 5.3333e-12/VOXEL_VOL;
@@ -266,18 +271,24 @@ public class Constants {
     
     
     /** COVID-19 PARAMETERS**/
+    public static final double AVOGRADO = 6.02214076e23;
     
+    public static double SarsCoV2_IFN_MAX_VIRAL_LOAD = 10;  //@25390891
     public static double SarsCoV2_HALF_LIFE = 0.9959768; //(t1/2 influenza 10.1128/JVI.01623-05)      (0.99792 //https://doi.org/10.1098/rsos.210787)
-    public static double SarsCoV2_REP_RATE = 0.009210062*2.5; //https://doi.org/10.1038/s41586-020-2708-8
-    public static double MAX_VIRAL_LOAD = 3.824892e-20;//1e4*log(10) molecules (10-100 initial number https://doi.org/10.1073/pnas.2024815118)
-    public static double SarsCoV2_UPTAKE_QTTY = 1.66113e-21;//a thousand molecules
+    public static double SarsCoV2_HALF_LIFE_INVITRO = 0.9996651; //median of the 4 values ( https://doi.org/10.3390/v15081693)
+    public static double SarsCoV2_REP_RATE = 0.062450*0.27 * 1.75;//*1.75 new fitting to Dinnon and Mauter paper //0.009210062*2.5;  https://doi.org/10.1038/s41586-020-2708-8
+    public static double MAX_VIRAL_LOAD = 10000;//SarsCoV2_IFN_MAX_VIRAL_LOAD*100;//3.824892e-20;//1e4*log(10) molecules (10-100 initial number https://doi.org/10.1073/pnas.2024815118)
+    public static double VIRAL_RELEASE_RATE = 0.002*10; //https://doi.org/10.1038/s41586-020-2708-8
+    public static double SarsCoV2_PNEU_UPTAKE_QTTY = 1.0;//1 particle
+    public static double SarsCoV2_MAC_UPTAKE_QTTY = 1.0;//1 particle
+    public static double ACTV_PER_PARTICLES = 1e-4; //1 active particle per 10000 particles ( https://doi.org/10.1073/pnas.2024815118)
     public static double DAMP_HALF_LIFE = 0.9768950939813351;
     public static double SAMP_HALF_LIFE = 0.9768950939813351;
     public static double VEGF_HALF_LIFE = 0.9768950939813351;
     public static double IFN1_HALF_LIFE = 0.9768950939813351;
     public static double IFN_I_HALF_LIFE = 0.9768950939813351;
-    public static double MA_IFN_QTTY =  4.983902e-22;//  1.495171e-21; // preliminary -- PCA with 8 eigen values and TNF alone. 
-    public static double DC_IFN_QTTY = 4.983902e-22;//https://doi.org/10.1182/blood-2006-05-023770     1.495171e-21; //5.922133e-19;
+    public static double MA_IFN_QTTY =  4.983902e-22 * 1.75; //*f new fitting to Dinnon and Mauter paper //*2;//  1.495171e-21; // preliminary -- PCA with 8 eigen values and TNF alone. 
+//    public static double DC_IFN_QTTY = 4.983902e-22;//https://doi.org/10.1182/blood-2006-05-023770     1.495171e-21; //5.922133e-19;
     public static double VEGF_QTTY = 5.280638e-22; //10.3389/fonc.2013.00196
     public static double Kd_IFNG = 3.0e-9; //median Ifnar2-EC (https://doi.org/10.1016/j.jmb.2006.11.053)
     public static double Kd_SAMP = 1; // 1 AU of SAMP has Kd of 1 by definition
@@ -290,7 +301,8 @@ public class Constants {
     public static double DAMP_QTTY = 1; //Based on Cyt_QTTY/Kd_Cyt average.
     public static double SAMP_QTTY = 1; //Based on Cyt_QTTY/Kd_Cyt average.
     //public static double PR_INF_DIE = 2.02e-07; //X https://doi.org/10.1098/rsos.210787 -- 1-exp(-1.01e-7*2)
-    public static double PR_NK_KILL = Math.exp(-1);//0.07675284; //DUMMY
+    public static double PR_APO = 0.00366666666;// 10.3934/mbe.2020288 (infected death rate 0.088/24h) 0.05; //Dummy 
+    public static double PR_NK_KILL = Math.exp(-1)*1.75;//0.07675284; //10.1093/infdis/jir352
     public static double MAX_NK = 160; //4% of 4e6 in 1 mL
     public static double NK_HALF_LIFE = 0.0001375292; //~7 days (10.1111/j.1365-2567.2007.02573.x)
     public static double MIN_NK = 250; //https://doi.org/10.7554/eLife.74623
@@ -301,8 +313,25 @@ public class Constants {
     public static double H2O2_QTTY = 2.38e-15; //DOI:10.1016/0014-5793(94)80241-6
     public static double H2O2_HALF_LIFE = 1.0+Math.log(0.5)/7.5; // DOI:10.1159/000276558
     public static double VIRAL_LAC_Kd = 2.980226e-07; //https://doi.org/10.1086/343809
+    public static double PR_NEIGHBOUR_INFECT = 1; //pneumocyte neighbour infectivity rate placeholder
+    public static double PR_NEIGHBOUR_IFN = 1 - Math.exp(-1); //pneumocyte neighbour IFN activate rate placeholder
+    public static double IFN1_INHIBITION = 0.8;//DUMMY
+    public static double PR_NK_KILLABLE = 0.1; //DUMMY
+    public static double PR_M1 = 0.01;
+    public static double PR_M2a = 0.5;
+    public static double PR_PNEUMOCYTE_CHANGE = 0.01; //DUMMY
+    public static double SarsCoV2_EPS = 0.1;
+    public static double PNEUMOCYTE_VOL = 7.63e-13; //L -- https://doi.org/10.1002/ar.1092430107
+    public static double SarsCoV2_IFN_REP_RATE = SarsCoV2_REP_RATE * 0.01;
+    public static double RPOIS_THRESHOLD = 20;
     
+    public static double MTORC_SarsCoV2_REP_RATE_MUL = 1;
     
+    public static double Kd_Sirolimus = 1;
+    
+    public static double Sirolimus_QTTY = 1;
+    
+//    public static double SIR_MUL = -1;
     
     /*public static double PR_INT_NK_P = 0.05; //DUMMY
     public static double IFN1_QTTY = 4.95e-19; //DUMMY: BASED ON Kd

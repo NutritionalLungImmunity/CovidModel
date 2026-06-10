@@ -4,7 +4,6 @@ import edu.uf.Diffusion.Diffuse;
 import edu.uf.interactable.Interactable;
 import edu.uf.interactable.Macrophage;
 import edu.uf.interactable.Molecule;
-import edu.uf.interactable.covid.Neutrophil;
 import edu.uf.interactable.covid.Pneumocyte;
 import edu.uf.intracellularState.EukaryoteSignalingNetwork;
 import edu.uf.utils.Constants;
@@ -56,12 +55,12 @@ public class LPS extends Molecule {
 	        	cell.bind(LPS.MOL_IDX);
 	        return true;
         }
-        if(interactable instanceof Neutrophil) {
-        	Neutrophil cell = (Neutrophil) interactable;
-	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_LPS, cell.getClock())) 
-	        	cell.bind(LPS.MOL_IDX);
-	        return true;
-        }
+//        if(interactable instanceof Neutrophil) {
+//        	Neutrophil cell = (Neutrophil) interactable;
+//	        if (Util.activationFunction(this.get(0, x, y, z), Constants.Kd_LPS, cell.getClock())) 
+//	        	cell.bind(LPS.MOL_IDX);
+//	        return true;
+//        }
         
         if(interactable instanceof Macrophage) {
         	Macrophage cell = (Macrophage) interactable;

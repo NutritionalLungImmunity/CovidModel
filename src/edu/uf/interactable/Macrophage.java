@@ -175,7 +175,7 @@ public class Macrophage extends Phagocyte{
 			
 			@Override
 			public void processBooleanNetwork() {
-				if(Macrophage.this.getClock().toc(BN_CLOCK, Constants.HALF_HOUR/Constants.TIME_STEP_SIZE)) { //convet minutes in iterations
+				if(Macrophage.this.getClock().toc(BN_CLOCK, (int) Constants.INV_UNIT_T)) { //convet minutes in iterations
 					int k = 0;
 					List<Integer> array = new ArrayList<>(size);
 					for(int i = 0; i < size; i++)
@@ -240,7 +240,7 @@ public class Macrophage extends Phagocyte{
 									this.booleanNetwork[IRF3] = this.booleanNetwork[TLR4];
 									break;
 								case 15:
-									this.booleanNetwork[ERK] = this.booleanNetwork[FCGR] | this.booleanNetwork[Dectin];
+									this.booleanNetwork[ERK] = this.booleanNetwork[FCGR];// | this.booleanNetwork[Dectin];
 									break;
 								case 16:
 									this.booleanNetwork[KLF4] = this.booleanNetwork[STAT6];

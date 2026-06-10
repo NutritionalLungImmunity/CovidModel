@@ -1,6 +1,8 @@
 package edu.uf.utils;
 
 import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 
 public class Rand {
 
@@ -49,6 +51,37 @@ public class Rand {
 	  	} while (p > L);
 
 	  	return k - 1; 
+	}
+	
+	/*CHECK THIS FUNCTION */
+	public int randpois(double lambda, double threshold) {
+		if(Math.abs(lambda) > threshold) return (int) Math.round(lambda + Math.sqrt(lambda)*randnorm());
+		double L = Math.exp(-lambda);
+	  	double p = 1.0;
+	  	int k = 0;
+	  	do {
+	  		k++;
+	  		p *= secRand.nextDouble();//Math.random();
+	  	} while (p > L);
+
+	  	return k - 1; 
+	}
+	
+	public int[] sample(int max, int size) {//int[] array) {
+		if(max == 0 || size == 0) return new int[0];
+		int[] array = new int[size];
+ 		List<Integer> indices = new ArrayList<>(size);
+		for(int i = 0; i < size; i++)
+			indices.add(i);
+		
+		int n = max;
+		for(int i = 0; i < size; i++) {
+			int k = secRand.nextInt(n--);
+			int j = indices.remove(k);
+			array[i] = j;
+		}
+		
+		return array;
 	}
 	
 	public double randunif() {

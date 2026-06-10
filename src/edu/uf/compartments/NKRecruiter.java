@@ -13,7 +13,7 @@ import edu.uf.utils.Rand;
 public class NKRecruiter extends Recruiter{
 
     public Cell createCell() { 
-        return new NK();
+        return new NK(NK.RESTING);
     }
     
     public int getQtty() {
